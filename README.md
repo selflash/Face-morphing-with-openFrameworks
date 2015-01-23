@@ -22,9 +22,16 @@ And you need also two images in your `openFrameworks/bin/data` folder.
 + face1.jpg
 + face2.jpg
 
+Requirements
+--------
++ ofxFaceTracker
++ ofxOpenCv
++ ofxCv
++ ofxDelaunay
++ OpenFrameworks 084
+
 Features:
 --------
-* OpenFrameworks 084 Examples!
 
 Updates:
 --------
