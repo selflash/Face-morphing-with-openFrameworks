@@ -1,7 +1,14 @@
 # Face morphing with openFrameworks
 
+
+![thumbnail.png](thumbnail.png)
+
+
 Description:
 --------
+
+http://labs.1-10.com/blog/facemorph-with-openframeworks.html
+
 This is example morphing faces with oepnFrameworks.  
 If you want to build the project, you need the following addons.
 
