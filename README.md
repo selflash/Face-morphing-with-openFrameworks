@@ -1,10 +1,7 @@
 # Face morphing with openFrameworks
 
-<iframe src="//player.vimeo.com/video/115956546" width="500" height="313" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <p><a href="http://vimeo.com/115956546">face-morphing</a> from <a href="http://vimeo.com/110design">1&rarr;10design, Inc.</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
 
-
-
-![thumbnail.png](thumbnail.png)
+![thumbnail.gif](thumbnail.gif)
 
 
 Description:
