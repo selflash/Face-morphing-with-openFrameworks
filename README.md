@@ -2,8 +2,8 @@
 
 Description:
 --------
-This is example morphing faces with oepnFrameworks.
-If you want to build you need the following addons.
+This is example morphing faces with oepnFrameworks.  
+If you want to build the project, you need the following addons.
 
 + ofxFaceTracker
 + ofxOpenCv
