@@ -19,10 +19,10 @@ If you want to build the project, you need the following addons.
 
 You need also some files for ofxFaceTracker in your 'openFrameworks//bin/data/model' folder.
 
-・face.con
-・face.tracker
-・face.tri
-・face2.tracker
++ face.con
++ face.tracker
++ face.tri
++ face2.tracker
 
 And also two images in your `openFrameworks/bin/data` folder.
 
