@@ -17,7 +17,7 @@ If you want to build the project, you need the following addons.
 + ofxCv
 + ofxDelaunay
 
-You need also some files for ofxFaceTracker in your /bin/data/model folder.
+You need also some files for ofxFaceTracker in your 'openFrameworks//bin/data/model' folder.
 
 ・face.con
 ・face.tracker
