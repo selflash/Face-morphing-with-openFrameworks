@@ -13,7 +13,7 @@ Description:
 http://labs.1-10.com/blog/facemorph-with-openframeworks.html
 
 This is an example faces morphing with oepnFrameworks.
-The operation has been confirmed on oepnFrameworks 0.9.8.
+The operation has been confirmed on oepnFrameworks 0.9.8 on macOS Sierra.
 
 How to build
 --------
