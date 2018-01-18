@@ -1,4 +1,7 @@
 # Face morphing with openFrameworks
+=========
+
+Last update 2018.1.18
 
 
 ![thumbnail.gif](thumbnail.gif)
@@ -10,7 +13,7 @@ Description:
 http://labs.1-10.com/blog/facemorph-with-openframeworks.html
 
 This is an example faces morphing with oepnFrameworks.
-
+The operation has been confirmed on oepnFrameworks 0.9.8.
 
 How to build
 --------
@@ -42,7 +45,6 @@ Requirements
 + ofxOpenCv
 + ofxCv
 + ofxDelaunay
-+ OpenFrameworks 084
 
 Features:
 --------
