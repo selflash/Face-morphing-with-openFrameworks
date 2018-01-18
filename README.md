@@ -9,27 +9,32 @@ Description:
 
 http://labs.1-10.com/blog/facemorph-with-openframeworks.html
 
-This is example morphing faces with oepnFrameworks.  
-If you want to build the project, you need the following addons.
+This is an example faces morphing with oepnFrameworks.
+
+
+How to build
+--------
+If you want to build this project, you need following addons.
 
 + ofxFaceTracker
 + ofxOpenCv
 + ofxCv
 + ofxDelaunay
 
-You need also some files for ofxFaceTracker in your 'openFrameworks//bin/data/model' folder.
+You need also following files in order to work. 
+
+Copy these files to "your project/bin/data/model" from "ofxFaceTracker/libs/FaceTracker/model".
 
 + face.con
 + face.tracker
 + face.tri
 + face2.tracker
 
-And also two images in your `openFrameworks/bin/data` folder.
+And also you need to put two images in "your project/bin/data/images".
+(I'm using images that resolution is 640x480)
 
 + face1.jpg
 + face2.jpg
-
-(I'm using 640x480)
 
 Requirements
 --------
