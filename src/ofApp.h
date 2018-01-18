@@ -11,7 +11,7 @@ class ofApp : public ofBaseApp {
     protected:
         
     private:
-        bool _debug;
+        bool _debug = false;
     
         ofxFaceTracker _face1Tracker;
         ofImage _image_face1;
@@ -33,12 +33,14 @@ class ofApp : public ofBaseApp {
         std::vector<ofVec3f*> _reference2;
         ofFbo _fbo2;
     
-        //モーフィング用
-        bool _isInterpolating;
-        float _interpolationRatio;
+//        ofShader _dissolveShader;
+//        ofVboMesh _vboQuad;
     
-        bool _showWireFrame;
+        //For morphing.
+        bool _isInterpolating = false;
+        float _interpolationRatio = 1.0;
 
+	
     public:
 		void setup();
 		void update();

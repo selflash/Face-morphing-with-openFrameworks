@@ -11,40 +11,55 @@ void ofApp::setup() {
 	ofSetVerticalSync(true);
     ofSetFrameRate(60);
     ofBackground(255);
-    ofEnableAlphaBlending();
-    
-    _debug = false;
     
 	_face1Tracker.setup();
-	_image_face1.loadImage("face1.jpg");
+    if(_image_face1.load("images/face1.jpg")) cout << "image1 had loaded" << endl;
     _delaunay_face1 = new ofxDelaunay();
     _fbo1.allocate(_image_face1.getWidth(), _image_face1.getHeight(), GL_RGBA);
     
 	_face2Tracker.setup();
-	_image_face2.loadImage("face2.jpg");
+	if(_image_face2.load("images/face2.jpg")) cout << "image2 had loaded" << endl;
     _delaunay_face2 = new ofxDelaunay();
-    _fbo2.allocate(_image_face1.getWidth(), _image_face1.getHeight(), GL_RGBA);
+    _fbo2.allocate(_image_face2.getWidth(), _image_face2.getHeight(), GL_RGBA);
+
+//    _dissolveShader.load("shaders/dissolve");
     
-    _isInterpolating = false;
-    _interpolationRatio = 1.0;
+    //------------------------------------------
+//    int width = ofGetWidth();
+//    int height = ofGetHeight();
+//    _vboQuad.clear();
+//    _vboQuad.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
+//    _vboQuad.addVertex(ofVec3f(0, 0, 0));
+//    _vboQuad.addVertex(ofVec3f(0, height, 0));
+//    _vboQuad.addVertex(ofVec3f(width, 0, 0));
+//    _vboQuad.addVertex(ofVec3f(width, height, 0));
+//    
+//    _vboQuad.addTexCoord(ofVec2f(0, 0));
+//    _vboQuad.addTexCoord(ofVec2f(0, height));
+//    _vboQuad.addTexCoord(ofVec2f(width, 0));
+//    _vboQuad.addTexCoord(ofVec2f(width, height));
+    //------------------------------------------
     
-    _showWireFrame = true;
+    ofEnableAlphaBlending();
     
-    //----------------------------------
-    //ジェネレート
+    
+    
+    //------------------------------------------
+    //setup
     _detectFace1();
     _detectFace2();
-
+    
     _updateFaceMesh1();
     _updateFaceMesh2();
     
     _updateReference1();
     _updateReference2();
-    //----------------------------------
+    //------------------------------------------
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
+    
     float temp;
     temp = (float)(ofGetMouseX() - ofGetWidth() * 0.5) / (float)(ofGetWidth() * 0.5);
     temp *= 2.0;
@@ -54,6 +69,16 @@ void ofApp::update() {
     _interpolationRatio += (temp - _interpolationRatio) * 0.1;
     
     _morphing();
+    
+//    _fbo1.begin();
+//    ofClear(255, 255, 255, 0);
+//    _drawFace1();
+//    _fbo1.end();
+//    
+//    _fbo2.begin();
+//    ofClear(255, 255, 255, 0);
+//    _drawFace2();
+//    _fbo2.end();
 }
 
 //--------------------------------------------------------------
@@ -62,7 +87,6 @@ void ofApp::draw() {
         _debugDraw();
     } else {
         //----------------------------------
-        //最終結果
         ofPushMatrix();
         ofTranslate(ofGetWidth() * 0.5 - 640 * 1.75 * 0.5, ofGetHeight() * 0.5 - 480 * 1.75 * 0.5);
         
@@ -71,20 +95,23 @@ void ofApp::draw() {
         _drawFace2(_interpolationRatio);
 
         ofPopMatrix();
+        
+//        _dissolveShader.begin();
+//        _dissolveShader.setUniformTexture("u_source", _fbo1.getTextureReference(), 0);
+//        _dissolveShader.setUniformTexture("u_dist", _fbo2.getTextureReference(), 1);
+//        _dissolveShader.setUniform1f("u_interpolationRatio", _interpolationRatio);
+//        _vboQuad.draw();
+//        _dissolveShader.end();
         //----------------------------------
     }
     
     //----------------------------------
     ofPushStyle();
-	ofSetColor(ofColor::red);
+	ofSetColor(0);
     
     std::string str = "";
     str += ofToString((int) ofGetFrameRate()) + "\n";
-//    str += "[STEP1] push 1 key\n";
-//    str += "[STEP2] push 2 key\n";
-//    str += "[STEP3] push space key\n";
-    str += "[DEBUG] push a key\n";
-    if(_debug) str += "[SHOW WIRE] push s key";
+    str += "[Debug] Push a key\n";
 	ofDrawBitmapString(str, 10, 20);
     ofPopStyle();
     //----------------------------------
@@ -113,7 +140,7 @@ void ofApp::_detectFace1() {
     int i; int l;
     
     //----------------------------------
-    //顔の点を追加
+    //Add points of a face.
     l = _mesh_face1.getNumVertices();
     for(i = 0; i < l; i++) {
         _delaunay_face1->addPoint(_mesh_face1.getVertex(i));
@@ -125,7 +152,7 @@ void ofApp::_detectFace1() {
     float scaleFactor;
     ofPolyline outline = _face1Tracker.getImageFeature(ofxFaceTracker::FACE_OUTLINE);
     ofVec2f position = _face1Tracker.getPosition();
-    //顔の輪郭を拡張した点を追加
+    //Add extended points of a contour of a face.
     scaleFactor = 1.5;
     l = outline.size();
     for(i = 0; i < l; i++) {
@@ -134,7 +161,7 @@ void ofApp::_detectFace1() {
         _delaunay_face1->addPoint(point);
         _points1.push_back(point);
     }
-    //顔の輪郭を拡張した点を追加
+    //Add extended points of a contour of a face.
     scaleFactor = 2.0;
     l = outline.size();
     for(i = 0; i < l; i++) {
@@ -143,7 +170,7 @@ void ofApp::_detectFace1() {
         _delaunay_face1->addPoint(point);
         _points1.push_back(point);
     }
-    //顔の輪郭を拡張した点を追加
+    //Add extended points of a contour of a face.
     scaleFactor = 2.5;
     l = outline.size();
     for(i = 0; i < l; i++) {
@@ -152,7 +179,7 @@ void ofApp::_detectFace1() {
         _delaunay_face1->addPoint(point);
         _points1.push_back(point);
     }
-    //顔の輪郭を拡張した点を追加
+    //Add extended points of a contour of a face.
     scaleFactor = 3.0;
     l = outline.size();
     for(i = 0; i < l; i++) {
@@ -161,10 +188,19 @@ void ofApp::_detectFace1() {
         _delaunay_face1->addPoint(point);
         _points1.push_back(point);
     }
+    //Add extended points of a contour of a face.
+//    scaleFactor = 3.5;
+//    l = outline.size();
+//    for(i = 0; i < l; i++) {
+//        ofVec2f point((outline[i] - position) * scaleFactor + position);
+//
+//        _delaunay_face1->addPoint(point);
+//        _points1.push_back(point);
+//    }
     //----------------------------------
     
     //----------------------------------
-    //画像の4角の点を追加
+    //Add 4 points to corners.
     _delaunay_face1->addPoint(ofVec2f(0, 0));
     _delaunay_face1->addPoint(ofVec2f(imageWidth, 0));
     _delaunay_face1->addPoint(ofVec2f(imageWidth, imageHeight));
@@ -197,7 +233,7 @@ void ofApp::_detectFace2() {
     int i; int l;
     
     //----------------------------------
-    //顔の点を追加
+    //Add points of a face.
     l = _mesh_face2.getNumVertices();
     for(i = 0; i < l; i++) {
         _delaunay_face2->addPoint(_mesh_face2.getVertex(i));
@@ -209,7 +245,7 @@ void ofApp::_detectFace2() {
     float scaleFactor;
     ofPolyline outline = _face2Tracker.getImageFeature(ofxFaceTracker::FACE_OUTLINE);
     ofVec2f position = _face2Tracker.getPosition();
-    //顔の輪郭を拡張した点を追加
+    //Add extended points of a contour of a face.
     scaleFactor = 1.5;
     l = outline.size();
     for(i = 0; i < l; i++) {
@@ -218,7 +254,7 @@ void ofApp::_detectFace2() {
         _delaunay_face2->addPoint(point);
         _points2.push_back(point);
     }
-    //顔の輪郭を拡張した点を追加
+    //Add extended points of a contour of a face.
     scaleFactor = 2.0;
     l = outline.size();
     for(i = 0; i < l; i++) {
@@ -227,7 +263,7 @@ void ofApp::_detectFace2() {
         _delaunay_face2->addPoint(point);
         _points2.push_back(point);
     }
-    //顔の輪郭を拡張した点を追加
+    //Add extended points of a contour of a face.
     scaleFactor = 2.5;
     l = outline.size();
     for(i = 0; i < l; i++) {
@@ -236,7 +272,7 @@ void ofApp::_detectFace2() {
         _delaunay_face2->addPoint(point);
         _points2.push_back(point);
     }
-    //顔の輪郭を拡張した点を追加
+    //Add extended points of a contour of a face.
     scaleFactor = 3.0;
     l = outline.size();
     for(i = 0; i < l; i++) {
@@ -245,10 +281,19 @@ void ofApp::_detectFace2() {
         _delaunay_face2->addPoint(point);
         _points2.push_back(point);
     }
+    //Add extended points of a contour of a face.
+//    scaleFactor = 3.5;
+//    l = outline.size();
+//    for(i = 0; i < l; i++) {
+//        ofVec2f point((outline[i] - position) * scaleFactor + position);
+//
+//        _delaunay_face2->addPoint(point);
+//        _points2.push_back(point);
+//    }
     //----------------------------------
     
     //----------------------------------
-    //画像の4角の点を追加
+    //Add 4 points to corners.
     _delaunay_face2->addPoint(ofVec2f(0, 0));
     _delaunay_face2->addPoint(ofVec2f(imageWidth, 0));
     _delaunay_face2->addPoint(ofVec2f(imageWidth, imageHeight));
@@ -443,31 +488,29 @@ void ofApp::_drawFace1(float alpha, bool debug) {
 
     if(!debug) return;
     
-    if(_showWireFrame) {
-        //--------------------------------------
-        ofPushStyle();
-        ofSetColor(255, 0, 0);
-        _finalMesh_face1.drawWireframe();
-        ofPopStyle();
-        //--------------------------------------
+    //--------------------------------------
+    ofPushStyle();
+    ofSetColor(255, 0, 0);
+    _finalMesh_face1.drawWireframe();
+    ofPopStyle();
+    //--------------------------------------
 
-        //--------------------------------------
-        l = _finalMesh_face1.getNumVertices();
-        for(i = 0; i < l; i++) {
-            ofVec3f position = _finalMesh_face1.getVertices()[i];
-            
-            ofPushMatrix();
-            ofTranslate(position.x, position.y);
-            
-            ofPushStyle();
-            ofSetColor(0, 0, 0);
-            ofDrawBitmapString(ofToString(i), -5, -5);
-            ofPopStyle();
-            
-            ofPopMatrix();
-        }
-        //--------------------------------------
+    //--------------------------------------
+    l = _finalMesh_face1.getNumVertices();
+    for(i = 0; i < l; i++) {
+        ofVec3f position = _finalMesh_face1.getVertices()[i];
+        
+        ofPushMatrix();
+        ofTranslate(position.x, position.y);
+        
+        ofPushStyle();
+        ofSetColor(0, 0, 0);
+        ofDrawBitmapString(ofToString(i), -5, -5);
+        ofPopStyle();
+        
+        ofPopMatrix();
     }
+    //--------------------------------------
 }
 //--------------------------------------------------------------
 void ofApp::_drawFace2(float alpha, bool debug) {
@@ -484,31 +527,29 @@ void ofApp::_drawFace2(float alpha, bool debug) {
     
     if(!debug) return;
     
-    if(_showWireFrame) {
-        //--------------------------------------
-        ofPushStyle();
-        ofSetColor(255, 0, 0);
-        _finalMesh_face2.drawWireframe();
-        ofPopStyle();
-        //--------------------------------------
+    //--------------------------------------
+    ofPushStyle();
+    ofSetColor(255, 0, 0);
+    _finalMesh_face2.drawWireframe();
+    ofPopStyle();
+    //--------------------------------------
+    
+    //--------------------------------------
+    l = _finalMesh_face2.getNumVertices();
+    for(i = 0; i < l; i++) {
+        ofVec3f position = _finalMesh_face2.getVertices()[i];
         
-        //--------------------------------------
-        l = _finalMesh_face2.getNumVertices();
-        for(i = 0; i < l; i++) {
-            ofVec3f position = _finalMesh_face2.getVertices()[i];
-            
-            ofPushMatrix();
-            ofTranslate(position.x, position.y);
-            
-            ofPushStyle();
-            ofSetColor(0, 0, 0);
-            ofDrawBitmapString(ofToString(i), -5, -5);
-            ofPopStyle();
-            
-            ofPopMatrix();
-        }
-        //--------------------------------------
+        ofPushMatrix();
+        ofTranslate(position.x, position.y);
+        
+        ofPushStyle();
+        ofSetColor(0, 0, 0);
+        ofDrawBitmapString(ofToString(i), -5, -5);
+        ofPopStyle();
+        
+        ofPopMatrix();
     }
+    //--------------------------------------
 }
 
 //--------------------------------------------------------------
@@ -523,6 +564,7 @@ void ofApp::_drawWireFrame1() {
     ofPushStyle();
     ofSetColor(255, 0, 0);
     triangulated->drawWireframe();
+    //    triangulated->drawFaces();
     ofPopStyle();
     _image_face1.unbind();
     
@@ -532,8 +574,13 @@ void ofApp::_drawWireFrame1() {
         ofTranslate(_delaunay_face1->triangleMesh.getVertices()[i].x, _delaunay_face1->triangleMesh.getVertices()[i].y);
         ofPushStyle();
         ofSetColor(255, 0, 0);
-        ofCircle(0, 0, 3);
+        ofDrawCircle(0, 0, 3);
         ofPopStyle();
+        
+        //        ofPushStyle();
+        //        ofSetColor(0, 0, 0);
+        //        ofDrawBitmapString(ofToString(i), -5, -5);
+        //        ofPopStyle();
         
         ofPopMatrix();
     }
@@ -563,7 +610,8 @@ void ofApp::_drawWireFrame2() {
     ofSetColor(255, 0, 0);
     triangulated->drawWireframe();
     ofPopStyle();
-    
+    //
+    //    triangulated->drawFaces();
     _image_face2.unbind();
     
     l = _delaunay_face2->triangleMesh.getNumVertices();
@@ -573,8 +621,13 @@ void ofApp::_drawWireFrame2() {
         
         ofPushStyle();
         ofSetColor(255, 0, 0);
-        ofCircle(0, 0, 3);
+        ofDrawCircle(0, 0, 3);
         ofPopStyle();
+        
+        //        ofPushStyle();
+        //        ofSetColor(0, 0, 0);
+        //        ofDrawBitmapString(ofToString(i), -5, -5);
+        //        ofPopStyle();
         
         ofPopMatrix();
     }
@@ -628,11 +681,8 @@ void ofApp::_morphing() {
 
 //--------------------------------------------------------------
 void ofApp::_debugDraw() {
-    ofPushMatrix();
-    ofScale(0.85, 0.85);
-    
     //----------------------------------
-    //オリジナルの画像を描画
+    //Draw an original image.
     ofPushMatrix();
 	ofTranslate(0, 0);
     _image_face1.draw(0, 0);
@@ -645,7 +695,7 @@ void ofApp::_debugDraw() {
     //----------------------------------
     
     //----------------------------------
-    //フェイストラッキング&ドロネー三角形分割
+    //Draw wireframes.
     ofPushMatrix();
 	ofTranslate(640, 0);
     _drawWireFrame1();
@@ -658,7 +708,7 @@ void ofApp::_debugDraw() {
     //----------------------------------
     
     //----------------------------------
-    //最終結果
+    //Draw a result.
     ofPushMatrix();
     ofTranslate(640 * 2, 0);
     _drawFace1(1.0, true);
@@ -669,24 +719,21 @@ void ofApp::_debugDraw() {
     _drawFace2(1.0, true);
     ofPopMatrix();
     //----------------------------------
-    
-    ofPopMatrix();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-    if(key == '1') _detectFace1();
-    if(key == '2') _detectFace2();
-    
-    if(key == ' ') {
-        _updateFaceMesh1();
-        _updateFaceMesh2();
-
-        _updateReference1();
-        _updateReference2();
-    }
+//    if(key == '1') _detectFace1();
+//    if(key == '2') _detectFace2();
+//    
+//    if(key == ' ') {
+//        _updateFaceMesh1();
+//        _updateFaceMesh2();
+//
+//        _updateReference1();
+//        _updateReference2();
+//    }
     if(key == 'a') _debug = !_debug;
-    if(key == 's') _showWireFrame = !_showWireFrame;
 }
 
 //--------------------------------------------------------------
